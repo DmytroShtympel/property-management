@@ -1,0 +1,65 @@
+@using PropertyManagement.Domain.Entities
+@model PropertyManagement.Web.Models.Applications.ApplicationListFilterViewModel
+@{
+    ViewData["Title"] = "Applications";
+    var allProperties = (List<Property>)ViewBag.Properties;
+}
+
+<h1>@(Model.IsManager ? "Applications" : "My Applications")</h1>
+
+<form method="get" class="row g-2 mb-3">
+    <div class="col-auto">
+        <select name="status" class="form-select" asp-items="Html.GetEnumSelectList<PropertyManagement.Domain.Enums.ApplicationStatus>()" onchange="this.form.submit()">
+            <option value="">All statuses</option>
+        </select>
+    </div>
+    @if (Model.IsManager)
+    {
+        <div class="col-auto">
+            <select name="propertyId" class="form-select" onchange="this.form.submit()">
+                <option value="">All properties</option>
+                @foreach (var property in allProperties)
+                {
+                    <option value="@property.Id" selected="@(Model.PropertyId == property.Id)">@property.Name</option>
+                }
+            </select>
+        </div>
+    }
+</form>
+
+@if (Model.Applications.Count == 0)
+{
+    <p class="text-muted">No applications found.</p>
+}
+else
+{
+    <table class="table">
+        <thead>
+            <tr>
+                <th>Property / Unit</th>
+                <th>Applicant(s)</th>
+                <th>Status</th>
+                <th>Created</th>
+                <th></th>
+            </tr>
+        </thead>
+        <tbody>
+            @foreach (var item in Model.Applications)
+            {
+                <tr>
+                    <td>@item.PropertyName &mdash; @item.UnitNumber</td>
+                    <td>@string.Join(", ", item.ApplicantNames)</td>
+                    <td><vc:application-status-badge status="item.Status" /></td>
+                    <td>@item.CreatedAtUtc.ToLocalTime().ToString("d")</td>
+                    <td>
+                        <a asp-action="Details" asp-route-id="@item.Id" class="btn btn-sm btn-outline-primary">View</a>
+                    </td>
+                </tr>
+            }
+        </tbody>
+    </table>
+}
+
+<hr class="my-4" />
+<h2 class="h5">Live grid (paged &amp; sorted via <code>/api/applications</code>)</h2>
+<vc:applications-grid />

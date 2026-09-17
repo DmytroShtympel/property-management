@@ -1,0 +1,13 @@
+@model PropertyManagement.Web.Models.Listings.UnitBrowseListItemViewModel
+
+<div class="card h-100">
+    <div class="card-body">
+        <h5 class="card-title">@Model.PropertyName &mdash; Unit @Model.UnitNumber</h5>
+        <h6 class="card-subtitle mb-2 text-muted">@Model.City, @Model.State</h6>
+        <p class="card-text">
+            @Model.UnitTypeName &middot; @Model.Bedrooms bd<br />
+            @Model.RentAmount.ToString("C") / month
+        </p>
+        <a asp-action="Details" asp-route-id="@Model.Id" class="btn btn-outline-primary btn-sm">View details</a>
+    </div>
+</div>

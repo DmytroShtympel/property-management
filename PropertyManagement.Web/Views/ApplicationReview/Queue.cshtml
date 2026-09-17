@@ -1,0 +1,59 @@
+@model List<PropertyManagement.Web.Models.Review.ReviewQueueItemViewModel>
+@{
+    ViewData["Title"] = "Review Queue";
+}
+
+<h1>Review Queue</h1>
+
+@if (TempData["ReviewError"] is string reviewError)
+{
+    <div class="alert alert-danger">@reviewError</div>
+}
+
+@if (Model.Count == 0)
+{
+    <p class="text-muted">No submitted applications waiting for review.</p>
+}
+else
+{
+    <table class="table">
+        <thead>
+            <tr>
+                <th>Property / Unit</th>
+                <th>Applicant(s)</th>
+                <th>Submitted</th>
+                <th>Claim</th>
+                <th></th>
+            </tr>
+        </thead>
+        <tbody>
+            @foreach (var item in Model)
+            {
+                <tr>
+                    <td>@item.PropertyName &mdash; @item.UnitNumber</td>
+                    <td>@string.Join(", ", item.ApplicantNames)</td>
+                    <td>@(item.SubmittedAtUtc?.ToLocalTime().ToString("g"))</td>
+                    <td>
+                        @if (item.ClaimedByName is null)
+                        {
+                            <span class="text-muted">Unclaimed</span>
+                        }
+                        else
+                        {
+                            <span>@item.ClaimedByName@(item.ClaimedByCurrentUser ? " (you)" : "")</span>
+                        }
+                    </td>
+                    <td class="text-end">
+                        @if (item.ClaimedByName is null)
+                        {
+                            <form asp-action="Claim" asp-route-id="@item.Id" method="post" class="d-inline">
+                                <button type="submit" class="btn btn-sm btn-outline-primary">Claim</button>
+                            </form>
+                        }
+                        <a asp-controller="Applications" asp-action="Details" asp-route-id="@item.Id" class="btn btn-sm btn-outline-secondary">View</a>
+                    </td>
+                </tr>
+            }
+        </tbody>
+    </table>
+}

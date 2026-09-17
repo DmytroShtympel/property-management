@@ -1,0 +1,43 @@
+@model PropertyManagement.Web.Models.Applications.ApplicationWizardViewModel
+
+<h4>Summary</h4>
+
+@if (Model.BlockingErrors.Count > 0)
+{
+    <div class="alert alert-danger">
+        <strong>The following must be fixed before this application can be submitted:</strong>
+        <ul class="mb-0">
+            @foreach (var group in Model.BlockingErrors.GroupBy(e => e.Section))
+            {
+                <li>
+                    @group.Key
+                    <ul>
+                        @foreach (var error in group)
+                        {
+                            <li>@error.Message</li>
+                        }
+                    </ul>
+                </li>
+            }
+        </ul>
+    </div>
+}
+else
+{
+    <div class="alert alert-success">Everything looks complete. You're ready to submit.</div>
+}
+
+<h5>Applicant Information</h5>
+<dl class="row">
+    <dt class="col-sm-3">Full legal name</dt>
+    <dd class="col-sm-9">@Model.ApplicantInformation.FullLegalName</dd>
+    <dt class="col-sm-3">Phone</dt>
+    <dd class="col-sm-9">@Model.ApplicantInformation.PhoneNumber</dd>
+    <dt class="col-sm-3">Email</dt>
+    <dd class="col-sm-9">@Model.ApplicantInformation.Email</dd>
+    <dt class="col-sm-3">Current address</dt>
+    <dd class="col-sm-9">@Model.ApplicantInformation.CurrentAddress</dd>
+</dl>
+
+<h5>Residence History</h5>
+<vc:residence-history-summary entries="Model.ResidenceHistoryEntries" />

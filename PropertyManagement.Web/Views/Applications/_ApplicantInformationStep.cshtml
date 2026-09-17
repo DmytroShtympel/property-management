@@ -1,0 +1,42 @@
+@model PropertyManagement.Web.Models.Applications.ApplicationWizardViewModel
+
+<h4>Applicant Information</h4>
+
+@if (Model.CurrentSectionErrors.Count > 0)
+{
+    <div class="alert alert-warning">
+        <strong>This section has not been fully completed yet:</strong>
+        <ul class="mb-0">
+            @foreach (var error in Model.CurrentSectionErrors)
+            {
+                <li>@error.Message</li>
+            }
+        </ul>
+    </div>
+}
+
+<input type="hidden" name="Version" value="@Model.ApplicantInformation.Version" />
+<div class="mb-3">
+    <label class="form-label">Full legal name</label>
+    <input name="FullLegalName" value="@Model.ApplicantInformation.FullLegalName" class="form-control" />
+</div>
+<div class="mb-3">
+    <label class="form-label">Phone number</label>
+    <input name="PhoneNumber" value="@Model.ApplicantInformation.PhoneNumber" class="form-control" />
+</div>
+<div class="mb-3">
+    <label class="form-label">Email</label>
+    <input name="Email" value="@Model.ApplicantInformation.Email" class="form-control" />
+</div>
+<div class="mb-3">
+    <label class="form-label">Current address</label>
+    <input name="CurrentAddress" value="@Model.ApplicantInformation.CurrentAddress" class="form-control" />
+</div>
+
+<hr />
+<h5>Co-applicants</h5>
+<p>@string.Join(", ", Model.ApplicantNames)</p>
+<div class="input-group mb-3" style="max-width: 420px;">
+    <input type="email" form="addCoApplicantForm" name="email" class="form-control" placeholder="Co-applicant's email" />
+    <button type="submit" form="addCoApplicantForm" class="btn btn-outline-secondary">Add co-applicant</button>
+</div>

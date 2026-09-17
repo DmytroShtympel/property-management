@@ -1,0 +1,13 @@
+@model List<PropertyManagement.Domain.Entities.UnitType>
+@{
+    ViewData["Title"] = "Unit Types";
+}
+
+<div class="d-flex justify-content-between align-items-center mb-3">
+    <h1>Unit Types</h1>
+    <button type="button" class="btn btn-primary" data-modal-trigger data-modal-url="@Url.Action("Create")" data-modal-refresh="#unitTypesList">
+        Add Unit Type
+    </button>
+</div>
+
+<partial name="_UnitTypesList" model="Model" />

@@ -1,0 +1,41 @@
+<div class="applications-grid" data-api-url="/api/applications">
+    <div class="d-flex gap-2 mb-2 align-items-center">
+        <label class="small text-muted mb-0">Status</label>
+        <select class="form-select form-select-sm" style="width:auto" data-grid-status>
+            <option value="">All</option>
+            <option value="Draft">Draft</option>
+            <option value="Submitted">Submitted</option>
+            <option value="UnderReview">Under Review</option>
+            <option value="Returned">Returned</option>
+            <option value="Approved">Approved</option>
+            <option value="Denied">Denied</option>
+            <option value="Withdrawn">Withdrawn</option>
+        </select>
+        <label class="small text-muted mb-0 ms-2">Rows</label>
+        <select class="form-select form-select-sm" style="width:auto" data-grid-page-size>
+            <option value="5">5</option>
+            <option value="10" selected>10</option>
+            <option value="25">25</option>
+        </select>
+    </div>
+    <table class="table">
+        <thead>
+            <tr>
+                <th role="button" data-grid-sort="createdAt">Created <span data-sort-indicator="createdAt"></span></th>
+                <th>Property / Unit</th>
+                <th>Applicant(s)</th>
+                <th role="button" data-grid-sort="status">Status <span data-sort-indicator="status"></span></th>
+                <th></th>
+            </tr>
+        </thead>
+        <tbody data-grid-body>
+            <tr><td colspan="5" class="text-muted">Loading&hellip;</td></tr>
+        </tbody>
+    </table>
+    <div class="d-flex justify-content-between align-items-center">
+        <span class="small text-muted" data-grid-summary></span>
+        <ul class="pagination pagination-sm mb-0" data-grid-pagination></ul>
+    </div>
+</div>
+
+<script src="~/js/applicationsGrid.js" asp-append-version="true"></script>

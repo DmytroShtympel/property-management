@@ -1,0 +1,16 @@
+@model List<PropertyManagement.Web.Models.Units.UnitListItemViewModel>
+@{
+    var property = (PropertyManagement.Domain.Entities.Property)ViewBag.Property;
+    ViewData["Title"] = $"Units - {property.Name}";
+}
+
+<p><a asp-controller="Properties" asp-action="Index">&laquo; Back to Properties</a></p>
+
+<div class="d-flex justify-content-between align-items-center mb-3">
+    <h1>@property.Name &mdash; Units</h1>
+    <button type="button" class="btn btn-primary" data-modal-trigger data-modal-url="@Url.Action("Create", new { propertyId = property.Id })" data-modal-refresh="#unitsList">
+        Add Unit
+    </button>
+</div>
+
+<partial name="_UnitsList" model="Model" />

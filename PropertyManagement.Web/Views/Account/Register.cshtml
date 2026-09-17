@@ -1,0 +1,57 @@
+@model PropertyManagement.Web.Models.Account.RegisterViewModel
+@{
+    ViewData["Title"] = "Register";
+}
+
+<h1>Register</h1>
+
+<div class="row">
+    <div class="col-md-6">
+        <form asp-action="Register" method="post">
+            <div asp-validation-summary="ModelOnly" class="text-danger"></div>
+            <div class="mb-3">
+                <label asp-for="FirstName" class="form-label"></label>
+                <input asp-for="FirstName" class="form-control" />
+                <span asp-validation-for="FirstName" class="text-danger"></span>
+            </div>
+            <div class="mb-3">
+                <label asp-for="LastName" class="form-label"></label>
+                <input asp-for="LastName" class="form-control" />
+                <span asp-validation-for="LastName" class="text-danger"></span>
+            </div>
+            <div class="mb-3">
+                <label asp-for="Email" class="form-label"></label>
+                <input asp-for="Email" class="form-control" />
+                <span asp-validation-for="Email" class="text-danger"></span>
+            </div>
+            <div class="mb-3">
+                <label asp-for="Password" class="form-label"></label>
+                <input asp-for="Password" class="form-control" />
+                <span asp-validation-for="Password" class="text-danger"></span>
+            </div>
+            <div class="mb-3">
+                <label asp-for="ConfirmPassword" class="form-label"></label>
+                <input asp-for="ConfirmPassword" class="form-control" />
+                <span asp-validation-for="ConfirmPassword" class="text-danger"></span>
+            </div>
+            <div class="mb-3">
+                <label class="form-label d-block">@Html.DisplayNameFor(m => m.Role)</label>
+                <div class="form-check form-check-inline">
+                    <input class="form-check-input" type="radio" asp-for="Role" value="Applicant" id="roleApplicant" />
+                    <label class="form-check-label" for="roleApplicant">Applicant</label>
+                </div>
+                <div class="form-check form-check-inline">
+                    <input class="form-check-input" type="radio" asp-for="Role" value="PropertyManager" id="roleManager" />
+                    <label class="form-check-label" for="roleManager">Property Manager</label>
+                </div>
+                <span asp-validation-for="Role" class="text-danger d-block"></span>
+            </div>
+            <button type="submit" class="btn btn-primary">Register</button>
+            <a asp-action="Login" class="btn btn-link">Already have an account? Log in</a>
+        </form>
+    </div>
+</div>
+
+@section Scripts {
+    <partial name="_ValidationScriptsPartial" />
+}

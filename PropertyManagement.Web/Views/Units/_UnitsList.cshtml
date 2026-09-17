@@ -1,0 +1,60 @@
+@model List<PropertyManagement.Web.Models.Units.UnitListItemViewModel>
+
+<div id="unitsList">
+    @if (Model.Count == 0)
+    {
+        <p class="text-muted">No units yet.</p>
+    }
+    else
+    {
+        <table class="table">
+            <thead>
+                <tr>
+                    <th>Unit #</th>
+                    <th>Bedrooms</th>
+                    <th>Rent</th>
+                    <th>Type</th>
+                    <th></th>
+                </tr>
+            </thead>
+            <tbody>
+                @foreach (var unit in Model)
+                {
+                    <tr class="@(unit.IsRemoved ? "text-muted" : "")">
+                        <td>
+                            @unit.UnitNumber
+                            @if (unit.IsRemoved)
+                            {
+                                <span class="badge bg-secondary">Removed</span>
+                            }
+                        </td>
+                        <td>@unit.Bedrooms</td>
+                        <td>@unit.RentAmount.ToString("C")</td>
+                        <td>
+                            @unit.UnitTypeName
+                            @if (!unit.UnitTypeIsActive)
+                            {
+                                <span class="badge bg-warning text-dark">Inactive type</span>
+                            }
+                        </td>
+                        <td class="text-end">
+                            @if (!unit.IsRemoved)
+                            {
+                                <button type="button" class="btn btn-sm btn-outline-secondary" data-modal-trigger data-modal-url="@Url.Action("Edit", new { id = unit.Id })" data-modal-refresh="#unitsList">Edit</button>
+                                <form asp-action="Deactivate" asp-route-id="@unit.Id" asp-route-propertyId="@unit.PropertyId" method="post" class="d-inline" onsubmit="return confirm('Remove this unit?');">
+                                    <button type="submit" class="btn btn-sm btn-outline-danger">Remove</button>
+                                </form>
+                            }
+                            else
+                            {
+                                <form asp-action="Reactivate" asp-route-id="@unit.Id" asp-route-propertyId="@unit.PropertyId" method="post" class="d-inline">
+                                    <button type="submit" class="btn btn-sm btn-outline-success">Restore</button>
+                                </form>
+                            }
+                        </td>
+                    </tr>
+                }
+            </tbody>
+        </table>
+    }
+</div>

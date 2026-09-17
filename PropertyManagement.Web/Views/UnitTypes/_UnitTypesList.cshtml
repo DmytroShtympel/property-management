@@ -1,0 +1,37 @@
+@model List<PropertyManagement.Domain.Entities.UnitType>
+
+<div id="unitTypesList">
+    <table class="table">
+        <thead>
+            <tr>
+                <th>Name</th>
+                <th>Status</th>
+                <th></th>
+            </tr>
+        </thead>
+        <tbody>
+            @foreach (var type in Model)
+            {
+                <tr>
+                    <td>@type.Name</td>
+                    <td>
+                        @if (type.IsActive)
+                        {
+                            <span class="badge bg-success">Active</span>
+                        }
+                        else
+                        {
+                            <span class="badge bg-secondary">Inactive</span>
+                        }
+                    </td>
+                    <td class="text-end">
+                        <button type="button" class="btn btn-sm btn-outline-secondary" data-modal-trigger data-modal-url="@Url.Action("Edit", new { id = type.Id })" data-modal-refresh="#unitTypesList">Edit</button>
+                        <form asp-action="ToggleActive" asp-route-id="@type.Id" asp-route-isActive="@(!type.IsActive)" method="post" class="d-inline">
+                            <button type="submit" class="btn btn-sm btn-outline-secondary">@(type.IsActive ? "Deactivate" : "Activate")</button>
+                        </form>
+                    </td>
+                </tr>
+            }
+        </tbody>
+    </table>
+</div>

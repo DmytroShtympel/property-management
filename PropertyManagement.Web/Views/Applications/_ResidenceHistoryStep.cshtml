@@ -1,0 +1,17 @@
+@model PropertyManagement.Web.Models.Applications.ApplicationWizardViewModel
+
+<h4>Residence History</h4>
+
+@if (Model.CurrentSectionErrors.Count > 0)
+{
+    <div class="alert alert-warning mb-3">At least one residence history entry is required before this application can be submitted.</div>
+}
+
+<button type="button" class="btn btn-outline-primary btn-sm mb-2"
+        data-modal-trigger
+        data-modal-url="@Url.Action("ResidenceHistoryForm", new { id = Model.Id })"
+        data-modal-refresh="#residenceHistoryList">
+    Add Residence
+</button>
+
+<partial name="_ResidenceHistoryList" model="Model" />
