@@ -40,4 +40,4 @@ else
 </dl>
 
 <h5>Residence History</h5>
-<vc:residence-history-summary entries="Model.ResidenceHistoryEntries" />
+@await Component.InvokeAsync("ResidenceHistorySummary", new { entries = Model.ResidenceHistoryEntries })

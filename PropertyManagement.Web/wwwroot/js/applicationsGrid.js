@@ -15,8 +15,8 @@
 
         function statusBadgeClass(status) {
             return {
-                Draft: 'bg-secondary', Submitted: 'bg-primary', UnderReview: 'bg-info text-dark', Returned: 'bg-warning text-dark',
-                Approved: 'bg-success', Denied: 'bg-danger', Withdrawn: 'bg-dark'
+                Draft: 'bg-secondary', Submitted: 'bg-info', UnderReview: 'bg-primary', Returned: 'bg-warning text-dark',
+                Approved: 'bg-success', Denied: 'bg-danger', Withdrawn: 'bg-secondary text-decoration-line-through'
             }[status] || 'bg-secondary';
         }
 

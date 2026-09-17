@@ -8,8 +8,66 @@ html {
   }
 }
 
+/* Brand-layer delta per DESIGN.md: one navy primary + a disciplined status-badge palette on
+   top of stock Bootstrap 5 — everything else (spacing, shapes, typography) stays default. */
+:root {
+  --bs-primary: #2c5282;
+  --bs-primary-rgb: 44, 82, 130;
+  --bs-primary-text-emphasis: #1a3350;
+  --bs-primary-bg-subtle: #dde7f0;
+  --bs-primary-border-subtle: #b8cbdc;
+  --bs-link-color: #2c5282;
+  --bs-link-color-rgb: 44, 82, 130;
+  --bs-link-hover-color: #1f3c61;
+  --bs-link-hover-color-rgb: 31, 60, 97;
+  --bs-info: #2b6cb0;
+  --bs-info-rgb: 43, 108, 176;
+  --bs-success: #2f855a;
+  --bs-success-rgb: 47, 133, 90;
+}
+
+.btn-primary {
+  --bs-btn-bg: #2c5282;
+  --bs-btn-border-color: #2c5282;
+  --bs-btn-hover-bg: #234166;
+  --bs-btn-hover-border-color: #1f3a5b;
+  --bs-btn-active-bg: #1f3a5b;
+  --bs-btn-active-border-color: #1c3550;
+  --bs-btn-disabled-bg: #2c5282;
+  --bs-btn-disabled-border-color: #2c5282;
+  --bs-btn-focus-shadow-rgb: 44, 82, 130;
+}
+
+.btn-outline-primary {
+  --bs-btn-color: #2c5282;
+  --bs-btn-border-color: #2c5282;
+  --bs-btn-hover-bg: #2c5282;
+  --bs-btn-hover-border-color: #2c5282;
+  --bs-btn-active-bg: #234166;
+  --bs-btn-active-border-color: #1f3a5b;
+}
+
+.nav-pills {
+  --bs-nav-pills-link-active-bg: #2c5282;
+}
+
+.navbar-brand {
+  font-weight: 600;
+}
+
+.form-control:focus,
+.form-select:focus,
+.form-check-input:focus {
+  border-color: #7d9cbe;
+}
+
+.form-check-input:checked {
+  background-color: #2c5282;
+  border-color: #2c5282;
+}
+
 .btn:focus, .btn:active:focus, .btn-link.nav-link:focus, .form-control:focus, .form-check-input:focus {
-  box-shadow: 0 0 0 0.1rem white, 0 0 0 0.25rem #258cfb;
+  box-shadow: 0 0 0 0.1rem white, 0 0 0 0.25rem rgba(44, 82, 130, 0.5);
 }
 
 html {

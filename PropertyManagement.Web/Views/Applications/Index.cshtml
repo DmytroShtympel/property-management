@@ -49,7 +49,7 @@ else
                 <tr>
                     <td>@item.PropertyName &mdash; @item.UnitNumber</td>
                     <td>@string.Join(", ", item.ApplicantNames)</td>
-                    <td><vc:application-status-badge status="item.Status" /></td>
+                    <td>@await Component.InvokeAsync("ApplicationStatusBadge", new { status = item.Status })</td>
                     <td>@item.CreatedAtUtc.ToLocalTime().ToString("d")</td>
                     <td>
                         <a asp-action="Details" asp-route-id="@item.Id" class="btn btn-sm btn-outline-primary">View</a>
@@ -62,4 +62,4 @@ else
 
 <hr class="my-4" />
 <h2 class="h5">Live grid (paged &amp; sorted via <code>/api/applications</code>)</h2>
-<vc:applications-grid />
+@await Component.InvokeAsync("ApplicationsGrid")

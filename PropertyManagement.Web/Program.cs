@@ -1,3 +1,4 @@
+using System.Text.Json.Serialization;
 using Microsoft.AspNetCore.Authorization;
 using PropertyManagement.Domain.Entities;
 using PropertyManagement.Infrastructure.Persistence.DependencyInjection;
@@ -8,7 +9,11 @@ var builder = WebApplication.CreateBuilder(args);
 
 builder.Services.AddInfrastructure(builder.Configuration);
 
-builder.Services.AddControllersWithViews();
+// The bonus FR-19 JSON API returns enums (ApplicationStatus) as strings, matching what
+// wwwroot/js/applicationsGrid.js expects — without this, System.Text.Json's default
+// (the numeric ordinal) leaks through instead of e.g. "Submitted".
+builder.Services.AddControllersWithViews()
+    .AddJsonOptions(options => options.JsonSerializerOptions.Converters.Add(new JsonStringEnumConverter()));
 
 builder.Services.AddAuthorization(options =>
 {

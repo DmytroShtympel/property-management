@@ -5,7 +5,7 @@
 }
 
 <h1>@Model.UnitLabel</h1>
-<p class="text-muted">Applicant(s): @string.Join(", ", Model.ApplicantNames) &middot; <vc:application-status-badge status="Model.Status" /></p>
+<p class="text-muted">Applicant(s): @string.Join(", ", Model.ApplicantNames) &middot; @await Component.InvokeAsync("ApplicationStatusBadge", new { status = Model.Status })</p>
 
 @if (!string.IsNullOrEmpty(Model.StaleSectionMessage))
 {

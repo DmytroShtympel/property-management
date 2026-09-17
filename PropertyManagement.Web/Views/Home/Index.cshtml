@@ -5,23 +5,23 @@
     ViewData["Title"] = "Home";
 }
 
-<div class="text-center">
-    <h1 class="display-4">Property Management</h1>
+<div class="text-center py-5">
+    <h1 class="display-4 mb-3">Property Management</h1>
 
     @if (!SignInManager.IsSignedIn(User))
     {
-        <p>Sign up as an applicant to browse units, or as a property manager to list properties.</p>
+        <p class="text-muted mb-4">Sign up as an applicant to browse units, or as a property manager to list properties.</p>
         <a asp-controller="Account" asp-action="Register" class="btn btn-primary">Get started</a>
     }
     else if (User.IsInRole(Roles.PropertyManager))
     {
-        <p>Manage your properties, units, and review submitted applications.</p>
+        <p class="text-muted mb-4">Manage your properties, units, and review submitted applications.</p>
         <a asp-controller="Properties" asp-action="Index" class="btn btn-primary me-2">My Properties</a>
         <a asp-controller="ApplicationReview" asp-action="Queue" class="btn btn-outline-primary">Review Queue</a>
     }
     else
     {
-        <p>Browse available units and manage your rental applications.</p>
+        <p class="text-muted mb-4">Browse available units and manage your rental applications.</p>
         <a asp-controller="Listings" asp-action="Index" class="btn btn-primary me-2">Browse Units</a>
         <a asp-controller="Applications" asp-action="Index" class="btn btn-outline-primary">My Applications</a>
     }

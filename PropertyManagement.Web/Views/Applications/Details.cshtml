@@ -11,7 +11,7 @@
         <h1>@Model.UnitLabel</h1>
         <p class="text-muted">Applicant(s): @string.Join(", ", Model.ApplicantNames)</p>
     </div>
-    <vc:application-status-badge status="Model.Status" />
+    @await Component.InvokeAsync("ApplicationStatusBadge", new { status = Model.Status })
 </div>
 
 @if (TempData["ReviewError"] is string reviewError)
@@ -34,7 +34,7 @@
         </dl>
 
         <h5>Residence History</h5>
-        <vc:residence-history-summary entries="Model.ResidenceHistoryEntries" />
+        @await Component.InvokeAsync("ResidenceHistorySummary", new { entries = Model.ResidenceHistoryEntries })
 
         @if (Model.Lease is not null)
         {
@@ -48,7 +48,7 @@
         }
 
         <h5>History</h5>
-        <vc:application-status-history items="Model.StatusHistory" />
+        @await Component.InvokeAsync("ApplicationStatusHistory", new { items = Model.StatusHistory })
 
         <div class="mt-3">
             @if (Model.CanEdit)
