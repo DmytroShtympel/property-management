@@ -2,7 +2,9 @@
 
 A rental-application system for a property management company, built for a .NET technical assessment: ASP.NET Core MVC + Razor on .NET 10, EF Core (code-first) against SQL Server, ASP.NET Core Identity for auth. Applicants browse units and submit applications through a guided, multi-section wizard; property managers review, approve/return/deny, and approvals automatically issue a 12-month lease.
 
-All 18 required functional requirements are implemented, along with 4 of the 5 optional bonus items: paginated/sorted grid + JSON API, review queue with claiming, property-manager-only notes, and multi-applicant support with stale-save protection. The fifth (save-with-errors) is not yet implemented.
+All 18 required functional requirements are implemented, along with all 5 optional bonus items: paginated/sorted grid + JSON API (OpenAPI at `/swagger`), review queue with claiming (`Under Review` status), property-manager-only notes, save-with-errors, and multi-applicant support with stale-save protection.
+
+**Validation behaviour in the application wizard:** `Continue` is strict — an invalid section re-renders with per-field errors and is not saved. `Save & continue anyway` is the opt-in save-with-errors path: it persists an incomplete section, and the Summary then lists everything still blocking submission (with a "Fix this section" link back to each) while Submit stays disabled.
 
 ## Prerequisites
 

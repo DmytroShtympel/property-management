@@ -11,6 +11,8 @@
             {
                 <li>
                     @group.Key
+                    <button type="submit" name="Action" value="@(group.Key == "Residence History" ? "goto-residencehistory" : "goto-applicantinformation")"
+                            class="btn btn-link btn-sm p-0 ms-2 align-baseline">Fix this section</button>
                     <ul>
                         @foreach (var error in group)
                         {

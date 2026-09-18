@@ -11,5 +11,6 @@ public enum ApplicationStatus
 
     /// <summary>Bonus FR-20: a Property Manager has claimed this Submitted application for
     /// review. Reversible back to Submitted via Release; not terminal.</summary>
+    [System.ComponentModel.DataAnnotations.Display(Name = "Under Review")]
     UnderReview = 6
 }

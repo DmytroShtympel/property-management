@@ -22,6 +22,8 @@ public class ApplicationStatusBadgeViewComponent : ViewComponent
             _ => "bg-secondary"
         };
 
-        return View(model: (status, cssClass));
+        var label = status == ApplicationStatus.UnderReview ? "Under Review" : status.ToString();
+
+        return View(model: (label, cssClass));
     }
 }

@@ -44,6 +44,8 @@
         @if (Model.CurrentStep < ApplicationStep.Summary)
         {
             <button type="submit" name="Action" value="continue" class="btn btn-primary">Continue</button>
+            <button type="submit" name="Action" value="force" class="btn btn-outline-secondary"
+                    title="Saves what you've entered even if it's incomplete, and lists what's still missing on the Summary. Submit stays blocked until it's fixed.">Save &amp; continue anyway</button>
         }
         else
         {

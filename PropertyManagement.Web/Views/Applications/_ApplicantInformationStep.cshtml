@@ -15,22 +15,31 @@
     </div>
 }
 
+@functions {
+    // Errors are routed to the field they belong to (FieldError.Field), not just listed above.
+    string? ErrorFor(string field) => Model.CurrentSectionErrors.FirstOrDefault(e => e.Field == field)?.Message;
+}
+
 <input type="hidden" name="Version" value="@Model.ApplicantInformation.Version" />
 <div class="mb-3">
-    <label class="form-label">Full legal name</label>
-    <input name="FullLegalName" value="@Model.ApplicantInformation.FullLegalName" class="form-control" />
+    <label class="form-label" for="FullLegalName">Full legal name</label>
+    <input id="FullLegalName" name="FullLegalName" value="@Model.ApplicantInformation.FullLegalName" class="form-control @(ErrorFor("FullLegalName") is null ? "" : "is-invalid")" />
+    @if (ErrorFor("FullLegalName") is { } nameError) { <div class="invalid-feedback">@nameError</div> }
 </div>
 <div class="mb-3">
-    <label class="form-label">Phone number</label>
-    <input name="PhoneNumber" value="@Model.ApplicantInformation.PhoneNumber" class="form-control" />
+    <label class="form-label" for="PhoneNumber">Phone number</label>
+    <input id="PhoneNumber" name="PhoneNumber" value="@Model.ApplicantInformation.PhoneNumber" class="form-control @(ErrorFor("PhoneNumber") is null ? "" : "is-invalid")" />
+    @if (ErrorFor("PhoneNumber") is { } phoneError) { <div class="invalid-feedback">@phoneError</div> }
 </div>
 <div class="mb-3">
-    <label class="form-label">Email</label>
-    <input name="Email" value="@Model.ApplicantInformation.Email" class="form-control" />
+    <label class="form-label" for="Email">Email</label>
+    <input id="Email" name="Email" value="@Model.ApplicantInformation.Email" class="form-control @(ErrorFor("Email") is null ? "" : "is-invalid")" />
+    @if (ErrorFor("Email") is { } emailError) { <div class="invalid-feedback">@emailError</div> }
 </div>
 <div class="mb-3">
-    <label class="form-label">Current address</label>
-    <input name="CurrentAddress" value="@Model.ApplicantInformation.CurrentAddress" class="form-control" />
+    <label class="form-label" for="CurrentAddress">Current address</label>
+    <input id="CurrentAddress" name="CurrentAddress" value="@Model.ApplicantInformation.CurrentAddress" class="form-control @(ErrorFor("CurrentAddress") is null ? "" : "is-invalid")" />
+    @if (ErrorFor("CurrentAddress") is { } addressError) { <div class="invalid-feedback">@addressError</div> }
 </div>
 
 <hr />

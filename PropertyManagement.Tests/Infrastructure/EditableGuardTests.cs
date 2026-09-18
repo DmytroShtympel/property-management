@@ -42,6 +42,29 @@ public class EditableGuardTests
         Assert.Equal("Maria Alvarez", db.ApplicantInformations.Single().FullLegalName);
     }
 
+    [Fact]
+    public async Task SaveApplicantInformationAsync_WithInvalidInput_PersistsItAsIncompleteAndListsItAsBlocking()
+    {
+        // Bonus save-with-errors: an invalid section can be saved; it is flagged incomplete and
+        // surfaces in the blocking-errors list that gates Submit.
+        await using var db = InMemoryDbContextFactory.Create();
+        var application = await SeedApplicationAsync(db, ApplicationStatus.Draft);
+        var sut = new ApplicationService(db, userManager: null!, workflow: null!);
+
+        await sut.SaveApplicantInformationAsync(application.Id, "maria",
+            new ApplicantInformationInput("Maria Alvarez", "", "not-an-email", "1 Main St", Version: 0));
+
+        var saved = db.ApplicantInformations.Single();
+        Assert.Equal("Maria Alvarez", saved.FullLegalName);
+        Assert.False(saved.IsComplete);
+
+        var reloaded = await db.RentalApplications.FindAsync(application.Id);
+        reloaded!.ApplicantInformation = saved;
+        var blocking = PropertyManagement.Domain.Services.Validation.ApplicationSectionValidator.GetBlockingErrors(reloaded);
+        Assert.Contains(blocking, e => e.Field == nameof(ApplicantInformation.Email));
+        Assert.Contains(blocking, e => e.Field == nameof(ApplicantInformation.PhoneNumber));
+    }
+
     [Theory]
     [InlineData(ApplicationStatus.Submitted)]
     [InlineData(ApplicationStatus.Approved)]

@@ -71,7 +71,12 @@ public class ApplicationsController(
         // FR-7: Back never saves. Continue/Submit validate the current section first — an invalid
         // section is re-rendered in place with errors and the posted (unsaved) values, leaving
         // persisted data untouched and never advancing.
-        if (application.CurrentStep == ApplicationStep.ApplicantInformation && model.Action != "back")
+        // Bonus (save-with-errors): "force" is the explicit opt-in alternative — it persists the
+        // section even though it fails validation and advances; the Summary then lists what still
+        // blocks Submit. Continue keeps its strict behavior, so the two never mix implicitly.
+        var force = model.Action == "force";
+        if (application.CurrentStep == ApplicationStep.ApplicantInformation
+            && model.Action != "back" && !model.Action.StartsWith("goto-"))
         {
             var candidate = new ApplicantInformation
             {
@@ -81,7 +86,7 @@ public class ApplicationsController(
                 CurrentAddress = model.CurrentAddress ?? ""
             };
             var errors = ApplicantInformationValidator.Validate(candidate);
-            if (errors.Count > 0)
+            if (errors.Count > 0 && !force)
             {
                 var invalidVm = BuildWizardViewModel(application);
                 invalidVm.ApplicantInformation = new ApplicantInformationStepViewModel
@@ -135,8 +140,16 @@ public class ApplicationsController(
                 }
                 break;
 
-            default: // "continue"
-                if (application.CurrentStep == ApplicationStep.ResidenceHistory)
+            case "goto-applicantinformation":
+                await applications.SetStepAsync(id, UserId, ApplicationStep.ApplicantInformation);
+                break;
+
+            case "goto-residencehistory":
+                await applications.SetStepAsync(id, UserId, ApplicationStep.ResidenceHistory);
+                break;
+
+            default: // "continue" or "force"
+                if (!force && application.CurrentStep == ApplicationStep.ResidenceHistory)
                 {
                     var sectionErrors = ResidenceHistoryValidator.ValidateSection(application.ResidenceHistoryEntries.ToList());
                     if (sectionErrors.Count > 0)

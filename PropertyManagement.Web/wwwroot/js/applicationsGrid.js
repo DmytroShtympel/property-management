@@ -29,7 +29,7 @@
                         '<td>' + new Date(row.createdAtUtc).toLocaleDateString() + '</td>' +
                         '<td>' + row.propertyName + ' — ' + row.unitNumber + '</td>' +
                         '<td>' + row.applicantNames + '</td>' +
-                        '<td><span class="badge ' + statusBadgeClass(row.status) + '">' + row.status + '</span></td>' +
+                        '<td><span class="badge ' + statusBadgeClass(row.status) + '">' + (row.status === 'UnderReview' ? 'Under Review' : row.status) + '</span></td>' +
                         '<td><a class="btn btn-sm btn-outline-primary" href="/Applications/Details/' + row.id + '">View</a></td>' +
                         '</tr>';
                 }).join('');
