@@ -2,7 +2,7 @@
 
 A rental-application system for a property management company, built for a .NET technical assessment: ASP.NET Core MVC + Razor on .NET 10, EF Core (code-first) against SQL Server, ASP.NET Core Identity for auth. Applicants browse units and submit applications through a guided, multi-section wizard; property managers review, approve/return/deny, and approvals automatically issue a 12-month lease.
 
-All 18 required functional requirements are implemented, along with all 5 optional bonus items (paginated/sorted grid + JSON API, review queue with claiming, property-manager-only notes, save-with-errors, multi-applicant support).
+All 18 required functional requirements are implemented, along with 4 of the 5 optional bonus items: paginated/sorted grid + JSON API, review queue with claiming, property-manager-only notes, and multi-applicant support with stale-save protection. The fifth (save-with-errors) is not yet implemented.
 
 ## Prerequisites
 
