@@ -50,6 +50,10 @@ internal static class BogusDataSeeder
         CreateApplication(db, faker, NextUnit(), [applicant2.Id], ApplicationStatus.Approved, manager2.Id, now);
         CreateApplication(db, faker, NextUnit(), [applicant1.Id], ApplicationStatus.Denied, manager1.Id, now);
         CreateApplication(db, faker, NextUnit(), [applicant2.Id], ApplicationStatus.Withdrawn, manager1.Id, now);
+        // Review-queue demo (bonus 2): one application claimed by each fixed manager, so either
+        // manager sees a claim of their own (Release) and one held by the other (read-only).
+        CreateApplication(db, faker, NextUnit(), [applicant1.Id], ApplicationStatus.UnderReview, manager1.Id, now);
+        CreateApplication(db, faker, NextUnit(), [applicant2.Id], ApplicationStatus.UnderReview, manager2.Id, now);
         // Co-applicant demo (bonus 5): both fixed applicants on one Submitted application.
         CreateApplication(db, faker, NextUnit(), [applicant1.Id, applicant2.Id], ApplicationStatus.Submitted, manager2.Id, now);
 
@@ -199,6 +203,17 @@ internal static class BogusDataSeeder
         if (targetStatus == ApplicationStatus.Submitted)
         {
             application.Status = ApplicationStatus.Submitted;
+            db.RentalApplications.Add(application);
+            return;
+        }
+
+        if (targetStatus == ApplicationStatus.UnderReview)
+        {
+            var claimedAt = submittedAt.AddDays(1);
+            application.Status = ApplicationStatus.UnderReview;
+            application.ClaimedByUserId = reviewerUserId;
+            application.ClaimedAtUtc = claimedAt;
+            AddHistory(application, ApplicationStatus.Submitted, ApplicationStatus.UnderReview, reviewerUserId, claimedAt, null);
             db.RentalApplications.Add(application);
             return;
         }

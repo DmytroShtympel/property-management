@@ -1,10 +1,11 @@
+@using PropertyManagement.Domain.Enums
 @model List<PropertyManagement.Web.Models.Applications.StatusHistoryItemViewModel>
 
 <ul class="list-group">
     @foreach (var item in Model)
     {
         <li class="list-group-item">
-            <strong>@(item.FromStatus is null ? "Created" : $"{item.FromStatus} → {item.ToStatus}")</strong>
+            <strong>@(item.FromStatus is null ? "Created" : $"{item.FromStatus.Value.DisplayName()} → {item.ToStatus.DisplayName()}")</strong>
             <span class="text-muted">&mdash; @item.ChangedAtUtc.ToLocalTime().ToString("g")@(item.ChangedByName is null ? "" : $" by {item.ChangedByName}")</span>
             @if (!string.IsNullOrWhiteSpace(item.Comment))
             {
