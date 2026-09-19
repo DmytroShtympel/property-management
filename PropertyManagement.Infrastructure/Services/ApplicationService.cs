@@ -13,7 +13,10 @@ public class ApplicationService(
     UserManager<ApplicationUser> userManager,
     ApplicationWorkflowService workflow) : IApplicationService
 {
+    // IgnoreQueryFilters: removing a unit or property only hides it from browsing and management;
+    // its applications and leases are kept, so the required Unit join must not drop them.
     private IQueryable<RentalApplication> FullGraph() => db.RentalApplications
+        .IgnoreQueryFilters()
         .Include(a => a.Applicants).ThenInclude(x => x.User)
         .Include(a => a.ApplicantInformation)
         .Include(a => a.ResidenceHistoryEntries)
@@ -121,7 +124,8 @@ public class ApplicationService(
         var info = application.ApplicantInformation;
         if (info is null)
         {
-            info = new ApplicantInformation { RentalApplicationId = applicationId };
+            // Starts at 1: a form rendered before this row existed carries 0, so a second "first save" is rejected as stale.
+            info = new ApplicantInformation { RentalApplicationId = applicationId, Version = 1 };
             db.ApplicantInformations.Add(info);
             application.ApplicantInformation = info;
         }

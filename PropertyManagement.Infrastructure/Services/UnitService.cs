@@ -6,8 +6,9 @@ namespace PropertyManagement.Infrastructure.Services;
 
 public class UnitService(ApplicationDbContext db) : IUnitService
 {
+    // IgnoreQueryFilters: removed units stay listed on their manager's page, flagged and restorable.
     public Task<List<Unit>> GetForPropertyAsync(int propertyId, string managerUserId, CancellationToken ct = default) =>
-        db.Units.Include(u => u.UnitType)
+        db.Units.IgnoreQueryFilters().Include(u => u.UnitType)
             .Where(u => u.PropertyId == propertyId && u.Property!.OwnerUserId == managerUserId)
             .OrderBy(u => u.UnitNumber)
             .ToListAsync(ct);

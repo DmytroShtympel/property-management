@@ -11,7 +11,9 @@ public class ApplicationReviewService(
     ApplicationWorkflowService workflow,
     ApplicationClaimService claimService) : IApplicationReviewService
 {
+    // IgnoreQueryFilters: a removed unit or property must not hide its applications (see ApplicationService).
     private IQueryable<RentalApplication> FullGraph() => db.RentalApplications
+        .IgnoreQueryFilters()
         .Include(a => a.Applicants).ThenInclude(x => x.User)
         .Include(a => a.ApplicantInformation)
         .Include(a => a.ResidenceHistoryEntries)
