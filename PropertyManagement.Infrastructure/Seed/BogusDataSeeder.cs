@@ -36,6 +36,14 @@ internal static class BogusDataSeeder
             CreateProperties(db, faker, mgr.Id, activeTypes, count: faker.Random.Int(1, 2));
         }
 
+        // One existing unit keeps the (now inactive) legacy type, so "an inactive value still displays
+        // on a unit that already uses it" is visible from the first run without any setup.
+        var inactiveType = unitTypes.FirstOrDefault(t => !t.IsActive);
+        if (inactiveType is not null)
+        {
+            manager1Properties[0].Units.First().UnitTypeId = inactiveType.Id;
+        }
+
         await db.SaveChangesAsync();
 
         var allUnits = manager1Properties.Concat(manager2Properties).SelectMany(p => p.Units).ToList();
@@ -122,12 +130,20 @@ internal static class BogusDataSeeder
             };
 
             var unitCount = faker.Random.Int(3, 6);
+            var usedNumbers = new HashSet<string>();
             for (var u = 0; u < unitCount; u++)
             {
                 var type = faker.PickRandom(activeTypes);
+                string unitNumber;
+                do
+                {
+                    unitNumber = $"{faker.Random.Int(1, 9)}{faker.Random.Char('A', 'F')}";
+                }
+                while (!usedNumbers.Add(unitNumber));
+
                 property.Units.Add(new Unit
                 {
-                    UnitNumber = $"{faker.Random.Int(1, 9)}{faker.Random.Char('A', 'F')}",
+                    UnitNumber = unitNumber,
                     Bedrooms = faker.Random.Int(0, 4),
                     RentAmount = faker.Random.Decimal(900, 3500),
                     UnitTypeId = type.Id
