@@ -7,6 +7,7 @@ using PropertyManagement.Domain.Enums;
 using PropertyManagement.Domain.Exceptions;
 using PropertyManagement.Domain.Services.Validation;
 using PropertyManagement.Infrastructure.Services;
+using PropertyManagement.Web.Models;
 using PropertyManagement.Web.Models.Applications;
 
 namespace PropertyManagement.Web.Controllers;
@@ -257,8 +258,30 @@ public class ApplicationsController(
             return PartialView("_ResidenceHistoryForm", model);
         }
 
+        return await ResidenceHistoryFragmentAsync(id);
+    }
+
+    [HttpGet]
+    public async Task<IActionResult> ResidenceHistoryConfirmRemove(int id, int entryId)
+    {
         var application = await applications.GetForWizardAsync(id, UserId);
-        return PartialView("_ResidenceHistoryList", BuildWizardViewModel(application!));
+        if (application is null)
+        {
+            return Forbid();
+        }
+
+        var entry = application.ResidenceHistoryEntries.FirstOrDefault(e => e.Id == entryId);
+        if (entry is null)
+        {
+            return NotFound();
+        }
+
+        return PartialView("_ConfirmRemoveModal", new ConfirmRemoveViewModel
+        {
+            Title = "Remove residence",
+            Message = $"Remove {entry.AddressLine1}, {entry.City} from your residence history?",
+            PostUrl = Url.Action(nameof(ResidenceHistoryDelete), new { id, entryId })!
+        });
     }
 
     [HttpPost, ValidateAntiForgeryToken]
@@ -278,8 +301,7 @@ public class ApplicationsController(
             TempData["StaleSectionError"] = ex.Message;
         }
 
-        var application = await applications.GetForWizardAsync(id, UserId);
-        return PartialView("_ResidenceHistoryList", BuildWizardViewModel(application!));
+        return await ResidenceHistoryFragmentAsync(id);
     }
 
     [HttpPost, ValidateAntiForgeryToken]
@@ -310,12 +332,20 @@ public class ApplicationsController(
             return Forbid();
         }
 
-        await applications.WithdrawAsync(id, UserId);
+        try
+        {
+            await applications.WithdrawAsync(id, UserId);
+        }
+        catch (InvalidApplicationTransitionException ex)
+        {
+            TempData["ReviewError"] = ex.Message;
+        }
+
         return RedirectToAction(nameof(Details), new { id });
     }
 
     [HttpGet]
-    public async Task<IActionResult> Details(int id)
+    public async Task<IActionResult> Details(int id, bool fragment = false)
     {
         RentalApplication? application = IsManager
             ? await review.GetDetailsAsync(id)
@@ -326,7 +356,19 @@ public class ApplicationsController(
             return Forbid();
         }
 
-        return View(BuildDetailsViewModel(application, IsManager));
+        var model = BuildDetailsViewModel(application, IsManager);
+        return fragment ? PartialView("_ApplicationDetails", model) : View(model);
+    }
+
+    private async Task<IActionResult> ResidenceHistoryFragmentAsync(int id)
+    {
+        var application = await applications.GetForWizardAsync(id, UserId);
+        return ViewComponent("ResidenceHistory", new
+        {
+            applicationId = id,
+            entries = application!.ResidenceHistoryEntries.Select(ToResidenceViewModel).ToList(),
+            isReadOnly = false
+        });
     }
 
     private ApplicationWizardViewModel BuildWizardViewModel(RentalApplication application, ApplicationStep? stepToShow = null)

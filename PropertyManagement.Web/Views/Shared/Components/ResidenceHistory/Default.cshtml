@@ -1,0 +1,63 @@
+@model PropertyManagement.Web.Models.Applications.ResidenceHistorySectionViewModel
+
+<div id="residenceHistoryList">
+    @if (!Model.IsReadOnly)
+    {
+        <button type="button" class="btn btn-outline-primary btn-sm mb-2"
+                data-modal-trigger
+                data-modal-url="@Url.Action("ResidenceHistoryForm", "Applications", new { id = Model.ApplicationId })"
+                data-modal-refresh="#residenceHistoryList">
+            Add Residence
+        </button>
+    }
+
+    @if (Model.Entries.Count == 0)
+    {
+        <p class="text-muted">No residence history entries yet.</p>
+    }
+    else
+    {
+        <table class="table table-sm">
+            <thead>
+                <tr>
+                    <th>Address</th>
+                    <th>Landlord</th>
+                    <th>Move-in</th>
+                    <th>Move-out</th>
+                    @if (!Model.IsReadOnly)
+                    {
+                        <th></th>
+                    }
+                </tr>
+            </thead>
+            <tbody>
+                @foreach (var entry in Model.Entries)
+                {
+                    <tr>
+                        <td>@entry.AddressLine1, @entry.City, @entry.State @entry.ZipCode</td>
+                        <td>@entry.LandlordName (@entry.LandlordPhone)</td>
+                        <td>@entry.MoveInDate.ToString("d")</td>
+                        <td>@(entry.MoveOutDate?.ToString("d") ?? "Present")</td>
+                        @if (!Model.IsReadOnly)
+                        {
+                            <td class="text-end">
+                                <button type="button" class="btn btn-sm btn-outline-secondary"
+                                        data-modal-trigger
+                                        data-modal-url="@Url.Action("ResidenceHistoryForm", "Applications", new { id = Model.ApplicationId, entryId = entry.Id })"
+                                        data-modal-refresh="#residenceHistoryList">
+                                    Edit
+                                </button>
+                                <button type="button" class="btn btn-sm btn-outline-danger"
+                                        data-modal-trigger
+                                        data-modal-url="@Url.Action("ResidenceHistoryConfirmRemove", "Applications", new { id = Model.ApplicationId, entryId = entry.Id })"
+                                        data-modal-refresh="#residenceHistoryList">
+                                    Remove
+                                </button>
+                            </td>
+                        }
+                    </tr>
+                }
+            </tbody>
+        </table>
+    }
+</div>

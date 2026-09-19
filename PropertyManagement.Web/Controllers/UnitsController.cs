@@ -4,6 +4,7 @@ using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.Rendering;
 using PropertyManagement.Domain.Entities;
 using PropertyManagement.Infrastructure.Services;
+using PropertyManagement.Web.Models;
 using PropertyManagement.Web.Models.Units;
 
 namespace PropertyManagement.Web.Controllers;
@@ -130,11 +131,28 @@ public class UnitsController(IUnitService units, IPropertyService properties, IU
         return await RefreshedListAsync(model.PropertyId);
     }
 
+    [HttpGet]
+    public async Task<IActionResult> ConfirmRemove(int id)
+    {
+        var unit = await units.GetByIdAsync(id, UserId);
+        if (unit is null)
+        {
+            return Forbid();
+        }
+
+        return PartialView("_ConfirmRemoveModal", new ConfirmRemoveViewModel
+        {
+            Title = "Remove unit",
+            Message = $"Remove unit {unit.UnitNumber}? Its existing applications and leases are kept.",
+            PostUrl = Url.Action(nameof(Deactivate), new { id, propertyId = unit.PropertyId })!
+        });
+    }
+
     [HttpPost, ValidateAntiForgeryToken]
     public async Task<IActionResult> Deactivate(int id, int propertyId)
     {
         await units.SetRemovedAsync(id, UserId, removed: true);
-        return RedirectToAction(nameof(Index), new { propertyId });
+        return await RefreshedListAsync(propertyId);
     }
 
     [HttpPost, ValidateAntiForgeryToken]

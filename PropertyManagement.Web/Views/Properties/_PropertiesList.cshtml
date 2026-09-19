@@ -35,9 +35,7 @@
                             @if (!property.IsRemoved)
                             {
                                 <button type="button" class="btn btn-sm btn-outline-secondary" data-modal-trigger data-modal-url="@Url.Action("Edit", new { id = property.Id })" data-modal-refresh="#propertiesList">Edit</button>
-                                <form asp-action="Deactivate" asp-route-id="@property.Id" method="post" class="d-inline" onsubmit="return confirm('Remove this property? Existing applications and leases are kept.');">
-                                    <button type="submit" class="btn btn-sm btn-outline-danger">Remove</button>
-                                </form>
+                                <button type="button" class="btn btn-sm btn-outline-danger" data-modal-trigger data-modal-url="@Url.Action("ConfirmRemove", new { id = property.Id })" data-modal-refresh="#propertiesList">Remove</button>
                             }
                             else
                             {

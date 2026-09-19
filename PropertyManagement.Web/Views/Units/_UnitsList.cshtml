@@ -41,9 +41,7 @@
                             @if (!unit.IsRemoved)
                             {
                                 <button type="button" class="btn btn-sm btn-outline-secondary" data-modal-trigger data-modal-url="@Url.Action("Edit", new { id = unit.Id })" data-modal-refresh="#unitsList">Edit</button>
-                                <form asp-action="Deactivate" asp-route-id="@unit.Id" asp-route-propertyId="@unit.PropertyId" method="post" class="d-inline" onsubmit="return confirm('Remove this unit?');">
-                                    <button type="submit" class="btn btn-sm btn-outline-danger">Remove</button>
-                                </form>
+                                <button type="button" class="btn btn-sm btn-outline-danger" data-modal-trigger data-modal-url="@Url.Action("ConfirmRemove", new { id = unit.Id })" data-modal-refresh="#unitsList">Remove</button>
                             }
                             else
                             {

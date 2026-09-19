@@ -4,6 +4,7 @@ using Microsoft.AspNetCore.Mvc;
 using PropertyManagement.Domain.Entities;
 using PropertyManagement.Infrastructure.Services;
 using PropertyManagement.Web.Authorization;
+using PropertyManagement.Web.Models;
 using PropertyManagement.Web.Models.Properties;
 
 namespace PropertyManagement.Web.Controllers;
@@ -77,11 +78,28 @@ public class PropertiesController(IPropertyService properties, IAuthorizationSer
         return await RefreshedListAsync();
     }
 
+    [HttpGet]
+    public async Task<IActionResult> ConfirmRemove(int id)
+    {
+        var property = await properties.GetByIdAsync(id, UserId);
+        if (property is null || !(await authorizationService.AuthorizeAsync(User, property, new PropertyOwnerRequirement())).Succeeded)
+        {
+            return Forbid();
+        }
+
+        return PartialView("_ConfirmRemoveModal", new ConfirmRemoveViewModel
+        {
+            Title = "Remove property",
+            Message = $"Remove {property.Name}? Its existing applications and leases are kept.",
+            PostUrl = Url.Action(nameof(Deactivate), new { id })!
+        });
+    }
+
     [HttpPost, ValidateAntiForgeryToken]
     public async Task<IActionResult> Deactivate(int id)
     {
         await properties.SetRemovedAsync(id, UserId, removed: true);
-        return RedirectToAction(nameof(Index));
+        return await RefreshedListAsync();
     }
 
     [HttpPost, ValidateAntiForgeryToken]

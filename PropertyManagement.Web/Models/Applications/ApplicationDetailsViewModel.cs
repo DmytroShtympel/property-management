@@ -2,15 +2,10 @@ using PropertyManagement.Domain.Enums;
 
 namespace PropertyManagement.Web.Models.Applications;
 
-public class ApplicationDetailsViewModel
+public class ApplicationDetailsViewModel : ApplicationSectionsViewModel
 {
-    public int Id { get; set; }
     public ApplicationStatus Status { get; set; }
     public string UnitLabel { get; set; } = string.Empty;
-    public List<string> ApplicantNames { get; set; } = [];
-
-    public ApplicantInformationStepViewModel ApplicantInformation { get; set; } = new();
-    public List<ResidenceHistoryEntryViewModel> ResidenceHistoryEntries { get; set; } = [];
     public List<StatusHistoryItemViewModel> StatusHistory { get; set; } = [];
     public LeaseSummaryViewModel? Lease { get; set; }
 
@@ -21,6 +16,9 @@ public class ApplicationDetailsViewModel
     public string? ClaimedByName { get; set; }
     public bool ClaimedByCurrentUser { get; set; }
     public List<ApplicationNoteViewModel> Notes { get; set; } = [];
+
+    /// <summary>Editing happens in the wizard; this page shows every section read-only.</summary>
+    public override bool IsSectionReadOnly(ApplicationStep section) => true;
 }
 
 public class StatusHistoryItemViewModel

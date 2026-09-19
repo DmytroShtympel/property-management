@@ -13,18 +13,15 @@
             <option value="">All statuses</option>
         </select>
     </div>
-    @if (Model.IsManager)
-    {
-        <div class="col-auto">
-            <select name="propertyId" class="form-select" onchange="this.form.submit()">
-                <option value="">All properties</option>
-                @foreach (var property in allProperties)
-                {
-                    <option value="@property.Id" selected="@(Model.PropertyId == property.Id)">@property.Name</option>
-                }
-            </select>
-        </div>
-    }
+    <div class="col-auto">
+        <select name="propertyId" class="form-select" onchange="this.form.submit()">
+            <option value="">All properties</option>
+            @foreach (var property in allProperties)
+            {
+                <option value="@property.Id" selected="@(Model.PropertyId == property.Id)">@property.Name</option>
+            }
+        </select>
+    </div>
 </form>
 
 @if (Model.Applications.Count == 0)

@@ -1,8 +1,10 @@
 using System.Security.Claims;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.EntityFrameworkCore;
 using PropertyManagement.Domain.Entities;
 using PropertyManagement.Domain.Exceptions;
+using PropertyManagement.Domain.Services.Validation;
 using PropertyManagement.Infrastructure.Services;
 using PropertyManagement.Web.Models.Review;
 
@@ -39,6 +41,10 @@ public class ApplicationReviewController(IApplicationReviewService review) : Con
         {
             TempData["ReviewError"] = "Another manager just claimed this application.";
         }
+        catch (Exception ex) when (ex is InvalidOperationException or InvalidApplicationTransitionException or DbUpdateConcurrencyException)
+        {
+            TempData["ReviewError"] = "This application changed while you were working on it. Reload the queue and try again.";
+        }
 
         return RedirectToAction(nameof(Queue));
     }
@@ -54,23 +60,28 @@ public class ApplicationReviewController(IApplicationReviewService review) : Con
         {
             TempData["ReviewError"] = "You do not currently hold the claim on this application.";
         }
+        catch (Exception ex) when (ex is InvalidApplicationTransitionException or DbUpdateConcurrencyException)
+        {
+            TempData["ReviewError"] = "This application changed while you were working on it. Reload the queue and try again.";
+        }
 
         return RedirectToAction(nameof(Queue));
     }
+
+    [HttpGet]
+    public IActionResult ReviewForm(int id) => PartialView("_ReviewForm", new ReviewDecisionViewModel { Id = id });
 
     [HttpPost, ValidateAntiForgeryToken]
     public async Task<IActionResult> Decide(ReviewDecisionViewModel model)
     {
         if (!Enum.TryParse<ReviewOutcome>(model.Outcome, out var outcome))
         {
-            TempData["ReviewError"] = "Choose an outcome.";
-            return RedirectToAction("Details", "Applications", new { id = model.Id });
+            return InvalidDecision(model, "Outcome", "Choose an outcome.");
         }
 
         if (outcome is ReviewOutcome.Deny or ReviewOutcome.Return && string.IsNullOrWhiteSpace(model.Comment))
         {
-            TempData["ReviewError"] = "A comment is required to Return or Deny an application.";
-            return RedirectToAction("Details", "Applications", new { id = model.Id });
+            return InvalidDecision(model, "Comment", "A comment is required to Return or Deny an application.");
         }
 
         try
@@ -79,10 +90,15 @@ public class ApplicationReviewController(IApplicationReviewService review) : Con
         }
         catch (Exception ex) when (ex is ApplicationNotClaimedException or InvalidApplicationTransitionException or UnitNotAvailableException)
         {
-            TempData["ReviewError"] = ex.Message;
+            return InvalidDecision(model, string.Empty, ex.Message);
+        }
+        catch (DbUpdateConcurrencyException)
+        {
+            return InvalidDecision(model, string.Empty, "This application changed while you were reviewing it. Close this window, reload the page and try again.");
         }
 
-        return RedirectToAction("Details", "Applications", new { id = model.Id });
+        // Success: the modal closes and the application page container is swapped with its refreshed fragment.
+        return RedirectToAction("Details", "Applications", new { id = model.Id, fragment = true });
     }
 
     [HttpPost, ValidateAntiForgeryToken]
@@ -94,5 +110,12 @@ public class ApplicationReviewController(IApplicationReviewService review) : Con
         }
 
         return RedirectToAction("Details", "Applications", new { id });
+    }
+
+    private IActionResult InvalidDecision(ReviewDecisionViewModel model, string field, string message)
+    {
+        model.Errors = [new FieldError("Review", field, message)];
+        Response.StatusCode = 422;
+        return PartialView("_ReviewForm", model);
     }
 }

@@ -1,0 +1,33 @@
+@model PropertyManagement.Web.Models.Review.ReviewDecisionViewModel
+@{
+    var commentError = Model.Errors.FirstOrDefault(e => e.Field == "Comment")?.Message;
+}
+
+<div class="modal-header">
+    <h5 class="modal-title">Review Application</h5>
+    <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+</div>
+<form asp-controller="ApplicationReview" asp-action="Decide" method="post">
+    <div class="modal-body">
+        @foreach (var error in Model.Errors.Where(e => e.Field != "Comment"))
+        {
+            <div class="alert alert-danger">@error.Message</div>
+        }
+        <input type="hidden" name="Id" value="@Model.Id" />
+        <input type="hidden" name="Outcome" value="" />
+        <div class="mb-3">
+            <label class="form-label" for="reviewComment">Comment (required for Return or Deny)</label>
+            <textarea id="reviewComment" name="Comment" class="form-control @(commentError is null ? "" : "is-invalid")" rows="3">@Model.Comment</textarea>
+            @if (commentError is not null)
+            {
+                <div class="invalid-feedback">@commentError</div>
+            }
+        </div>
+    </div>
+    <div class="modal-footer">
+        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
+        <button type="submit" class="btn btn-success" onclick="this.form.elements['Outcome'].value='Approve'">Approve</button>
+        <button type="submit" class="btn btn-warning" onclick="this.form.elements['Outcome'].value='Return'">Return</button>
+        <button type="submit" class="btn btn-danger" onclick="this.form.elements['Outcome'].value='Deny'">Deny</button>
+    </div>
+</form>

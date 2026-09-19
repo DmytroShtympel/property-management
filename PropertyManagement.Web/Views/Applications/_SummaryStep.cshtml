@@ -1,3 +1,4 @@
+@using PropertyManagement.Domain.Enums
 @model PropertyManagement.Web.Models.Applications.ApplicationWizardViewModel
 
 <h4>Summary</h4>
@@ -30,16 +31,7 @@ else
 }
 
 <h5>Applicant Information</h5>
-<dl class="row">
-    <dt class="col-sm-3">Full legal name</dt>
-    <dd class="col-sm-9">@Model.ApplicantInformation.FullLegalName</dd>
-    <dt class="col-sm-3">Phone</dt>
-    <dd class="col-sm-9">@Model.ApplicantInformation.PhoneNumber</dd>
-    <dt class="col-sm-3">Email</dt>
-    <dd class="col-sm-9">@Model.ApplicantInformation.Email</dd>
-    <dt class="col-sm-3">Current address</dt>
-    <dd class="col-sm-9">@Model.ApplicantInformation.CurrentAddress</dd>
-</dl>
+<partial name="_ApplicantInformationSection" model="Model" />
 
 <h5>Residence History</h5>
-@await Component.InvokeAsync("ResidenceHistorySummary", new { entries = Model.ResidenceHistoryEntries })
+@await Component.InvokeAsync("ResidenceHistory", new { applicationId = Model.Id, entries = Model.ResidenceHistoryEntries, isReadOnly = Model.IsSectionReadOnly(ApplicationStep.ResidenceHistory) })

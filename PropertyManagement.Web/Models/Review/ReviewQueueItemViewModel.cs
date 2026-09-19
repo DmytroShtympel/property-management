@@ -1,3 +1,5 @@
+using PropertyManagement.Domain.Services.Validation;
+
 namespace PropertyManagement.Web.Models.Review;
 
 public class ReviewQueueItemViewModel
@@ -16,4 +18,5 @@ public class ReviewDecisionViewModel
     public int Id { get; set; }
     public string Outcome { get; set; } = string.Empty; // Approve | Deny | Return
     public string? Comment { get; set; }
+    public List<FieldError> Errors { get; set; } = [];
 }

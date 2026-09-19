@@ -1,7 +1,8 @@
 // Shared convention for every "modal populated from a partial view returned by a controller
-// action" in this app (Property, Unit, UnitType, Residence History, Review). One script drives
-// all of them: 422 + form partial re-renders the modal in place with validation errors; a 2xx
-// response closes the modal and swaps the page's list/summary container via data-modal-refresh.
+// action" in this app (Property, Unit, UnitType, Residence History, Review, and every remove
+// confirmation). One script drives all of them: 422 + the same partial re-renders the modal in
+// place with validation errors; a 2xx response closes the modal and swaps the page container
+// named by data-modal-refresh with the response fragment.
 (function () {
     var modalEl = document.getElementById('sharedModal');
     if (!modalEl) {
@@ -67,40 +68,5 @@
     modalEl.addEventListener('hidden.bs.modal', function () {
         contentEl.innerHTML = '';
         refreshTarget = null;
-    });
-
-    // Generic "POST, optionally confirm, swap a target container" trigger, for actions like
-    // deleting a residence history row that can't be a nested <form> (they live inside the
-    // wizard's own outer form).
-    document.addEventListener('click', function (e) {
-        var btn = e.target.closest('[data-post-trigger]');
-        if (!btn) {
-            return;
-        }
-        e.preventDefault();
-
-        var confirmMessage = btn.getAttribute('data-confirm');
-        if (confirmMessage && !confirm(confirmMessage)) {
-            return;
-        }
-
-        var token = document.querySelector('input[name="__RequestVerificationToken"]');
-        var body = new URLSearchParams();
-        if (token) {
-            body.append('__RequestVerificationToken', token.value);
-        }
-
-        fetch(btn.getAttribute('data-post-url'), {
-            method: 'POST',
-            body: body,
-            headers: { 'X-Requested-With': 'XMLHttpRequest' }
-        }).then(function (res) {
-            return res.text().then(function (html) {
-                var target = document.querySelector(btn.getAttribute('data-post-refresh'));
-                if (target) {
-                    target.outerHTML = html;
-                }
-            });
-        });
     });
 })();
