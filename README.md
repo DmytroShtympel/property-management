@@ -25,7 +25,7 @@ Then open **http://localhost:5117** (the default launch profile also opens your 
 
 On first run the app:
 1. Creates the `PropertyManagementDb` database and applies the EF Core migrations automatically (`Database.MigrateAsync()` on startup — no manual `dotnet ef database update` step).
-2. Seeds it with Bogus: lookups, two property managers, two applicants (plus a few generated ones), properties and units, and applications in every status — including one seeded `Loft` unit type marked **Inactive**, so that behavior is visible without toggling it yourself.
+2. Seeds it with Bogus: lookups, two property managers, two applicants (plus a few generated ones), properties and units, and applications in every status — including a `Loft` unit type marked **Inactive** that one seeded unit still uses, so the inactive-type rules are visible without any setup.
 
 Seeding is idempotent, one guard per phase: roles and the four demo accounts are created only when missing, unit types only when that table is empty, and the generated properties/units/applications only when the database has no properties yet — so restarting never duplicates anything. To reset to a clean demo state, drop the database and start the app again.
 
@@ -37,7 +37,7 @@ All seeded accounts use the password **`Passw0rd1!`**. You can also sign up a ne
 |---|---|---|
 | `applicant1@demo.local` | Applicant (Jordan Lee) | A Draft, a Returned (with the manager's comment), a Denied, an Under Review, and a co-applicant Submitted application |
 | `applicant2@demo.local` | Applicant (Casey Kim) | A Submitted, an Approved (with its 12-month lease), a Withdrawn, an Under Review, and the co-applicant Submitted application |
-| `manager1@demo.local` | Property Manager (Morgan Reyes) | Review Queue with unclaimed Submitted applications to claim, one application already claimed by this manager (Release), and one held by manager2 (view-only) |
+| `manager1@demo.local` | Property Manager (Morgan Reyes) | Review Queue with unclaimed Submitted applications to claim, one application already claimed by this manager (Release), and one held by manager2 (view-only). Owns the unit that still uses the inactive `Loft` type (flagged "Inactive type" on its property's Units page) |
 | `manager2@demo.local` | Property Manager (Priya Anand) | Same queue from the other side |
 
 ### Using a different SQL Server
