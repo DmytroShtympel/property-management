@@ -183,6 +183,16 @@ public class ApplicationService(
         }
         else
         {
+            // A repeated post of the same form (double-click, retry) must not add the entry twice.
+            var existing = application.ResidenceHistoryEntries.FirstOrDefault(e =>
+                e.AddressLine1 == input.AddressLine1 && e.City == input.City && e.State == input.State && e.ZipCode == input.ZipCode &&
+                e.LandlordName == input.LandlordName && e.LandlordPhone == input.LandlordPhone &&
+                e.MoveInDate == input.MoveInDate && e.MoveOutDate == input.MoveOutDate);
+            if (existing is not null)
+            {
+                return existing;
+            }
+
             entry = new ResidenceHistoryEntry { RentalApplicationId = applicationId };
             db.ResidenceHistoryEntries.Add(entry);
             application.ResidenceHistoryEntries.Add(entry);

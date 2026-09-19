@@ -49,6 +49,14 @@
         }
         e.preventDefault();
 
+        // A double-click, or Enter followed by a click, must send one request, not two.
+        if (form.dataset.submitting === 'true') {
+            return;
+        }
+        form.dataset.submitting = 'true';
+        var buttons = form.querySelectorAll('button[type="submit"]');
+        buttons.forEach(function (button) { button.disabled = true; });
+
         fetch(form.getAttribute('action'), {
             method: 'POST',
             body: new FormData(form),
@@ -62,6 +70,9 @@
                     swapRefreshTarget(html);
                 }
             });
+        }).catch(function () {
+            form.dataset.submitting = '';
+            buttons.forEach(function (button) { button.disabled = false; });
         });
     });
 
