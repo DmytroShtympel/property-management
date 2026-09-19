@@ -5,7 +5,7 @@
 
 <h1>Review Queue</h1>
 
-@if (TempData["ReviewError"] is string reviewError)
+@if (TempData[TempDataKeys.ReviewError] is string reviewError)
 {
     <div class="alert alert-danger">@reviewError</div>
 }

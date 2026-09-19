@@ -6,6 +6,7 @@ using PropertyManagement.Domain.Entities;
 using PropertyManagement.Domain.Exceptions;
 using PropertyManagement.Domain.Services.Validation;
 using PropertyManagement.Infrastructure.Services;
+using PropertyManagement.Web.Models;
 using PropertyManagement.Web.Models.Review;
 
 namespace PropertyManagement.Web.Controllers;
@@ -39,11 +40,11 @@ public class ApplicationReviewController(IApplicationReviewService review) : Con
         }
         catch (ApplicationAlreadyClaimedException)
         {
-            TempData["ReviewError"] = "Another manager just claimed this application.";
+            TempData[TempDataKeys.ReviewError] = "Another manager just claimed this application.";
         }
         catch (Exception ex) when (ex is InvalidOperationException or InvalidApplicationTransitionException or DbUpdateConcurrencyException)
         {
-            TempData["ReviewError"] = "This application changed while you were working on it. Reload the queue and try again.";
+            TempData[TempDataKeys.ReviewError] = "This application changed while you were working on it. Reload the queue and try again.";
         }
 
         return RedirectToAction(nameof(Queue));
@@ -58,11 +59,11 @@ public class ApplicationReviewController(IApplicationReviewService review) : Con
         }
         catch (ApplicationNotClaimedException)
         {
-            TempData["ReviewError"] = "You do not currently hold the claim on this application.";
+            TempData[TempDataKeys.ReviewError] = "You do not currently hold the claim on this application.";
         }
         catch (Exception ex) when (ex is InvalidApplicationTransitionException or DbUpdateConcurrencyException)
         {
-            TempData["ReviewError"] = "This application changed while you were working on it. Reload the queue and try again.";
+            TempData[TempDataKeys.ReviewError] = "This application changed while you were working on it. Reload the queue and try again.";
         }
 
         return RedirectToAction(nameof(Queue));

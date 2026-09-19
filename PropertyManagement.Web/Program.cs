@@ -15,11 +15,10 @@ builder.Services.AddInfrastructure(builder.Configuration);
 builder.Services.AddControllersWithViews()
     .AddJsonOptions(options => options.JsonSerializerOptions.Converters.Add(new JsonStringEnumConverter()));
 
-builder.Services.AddAuthorization(options =>
-{
-    options.AddPolicy("ManagerOnly", p => p.RequireRole(Roles.PropertyManager));
-    options.AddPolicy("ApplicantOnly", p => p.RequireRole(Roles.Applicant));
-});
+// Controllers enforce roles directly via [Authorize(Roles = Roles.X)] and resource-based
+// requirements below (PropertyOwnerRequirement, ApplicationAccessRequirement) — no named
+// policies are needed.
+builder.Services.AddAuthorization();
 builder.Services.AddSingleton<IAuthorizationHandler, PropertyOwnerHandler>();
 builder.Services.AddSingleton<IAuthorizationHandler, ApplicationAccessHandler>();
 

@@ -10,7 +10,7 @@
         @await Component.InvokeAsync("ApplicationStatusBadge", new { status = Model.Status })
     </div>
 
-    @if (TempData["ReviewError"] is string reviewError)
+    @if (TempData[TempDataKeys.ReviewError] is string reviewError)
     {
         <div class="alert alert-danger">@reviewError</div>
     }

@@ -115,7 +115,7 @@ public class ApplicationsController(
             }
             catch (DbUpdateConcurrencyException)
             {
-                TempData["StaleSectionError"] = "Someone else changed the Applicant Information section while you were editing it. Please reload and try again.";
+                TempData[TempDataKeys.StaleSectionError] = "Someone else changed the Applicant Information section while you were editing it. Please reload and try again.";
                 return RedirectToAction(nameof(Wizard), new { id });
             }
         }
@@ -141,7 +141,7 @@ public class ApplicationsController(
                     }
                     catch (Exception ex) when (ex is InvalidOperationException or UnitNotAvailableException)
                     {
-                        TempData["StaleSectionError"] = ex.Message;
+                        TempData[TempDataKeys.StaleSectionError] = ex.Message;
                     }
                 }
                 break;
@@ -298,7 +298,7 @@ public class ApplicationsController(
         }
         catch (InvalidOperationException ex)
         {
-            TempData["StaleSectionError"] = ex.Message;
+            TempData[TempDataKeys.StaleSectionError] = ex.Message;
         }
 
         return await ResidenceHistoryFragmentAsync(id);
@@ -318,7 +318,7 @@ public class ApplicationsController(
         }
         catch (InvalidOperationException ex)
         {
-            TempData["StaleSectionError"] = ex.Message;
+            TempData[TempDataKeys.StaleSectionError] = ex.Message;
         }
 
         return RedirectToAction(nameof(Wizard), new { id });
@@ -338,7 +338,7 @@ public class ApplicationsController(
         }
         catch (InvalidApplicationTransitionException ex)
         {
-            TempData["ReviewError"] = ex.Message;
+            TempData[TempDataKeys.ReviewError] = ex.Message;
         }
 
         return RedirectToAction(nameof(Details), new { id });
@@ -411,7 +411,7 @@ public class ApplicationsController(
             CurrentSectionErrors = currentErrors,
             BlockingErrors = blocking,
             LatestReturnComment = latestReturn?.Comment,
-            StaleSectionMessage = TempData["StaleSectionError"] as string
+            StaleSectionMessage = TempData[TempDataKeys.StaleSectionError] as string
         };
     }
 
