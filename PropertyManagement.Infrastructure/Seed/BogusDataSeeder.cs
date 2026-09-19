@@ -41,7 +41,9 @@ internal static class BogusDataSeeder
         var inactiveType = unitTypes.FirstOrDefault(t => !t.IsActive);
         if (inactiveType is not null)
         {
-            manager1Properties[0].Units.First().UnitTypeId = inactiveType.Id;
+            var legacyUnit = manager1Properties[0].Units.First();
+            legacyUnit.UnitTypeId = inactiveType.Id;
+            legacyUnit.Bedrooms = BedroomsFor(inactiveType, legacyUnit.Bedrooms);
         }
 
         await db.SaveChangesAsync();
@@ -113,6 +115,20 @@ internal static class BogusDataSeeder
         return users;
     }
 
+    // Bedrooms a unit of each seeded type can plausibly have; the drawn value is clamped into the type's range.
+    private static readonly Dictionary<string, (int Min, int Max)> BedroomRanges = new()
+    {
+        ["Studio"] = (0, 0),
+        ["1 Bedroom"] = (1, 1),
+        ["2 Bedroom"] = (2, 2),
+        ["3 Bedroom"] = (3, 3),
+        ["Townhouse"] = (2, 4),
+        ["Loft"] = (1, 2)
+    };
+
+    private static int BedroomsFor(UnitType type, int drawn) =>
+        BedroomRanges.TryGetValue(type.Name, out var range) ? Math.Clamp(drawn, range.Min, range.Max) : drawn;
+
     private static List<Property> CreateProperties(ApplicationDbContext db, Faker faker, string ownerUserId, List<UnitType> activeTypes, int count)
     {
         var properties = new List<Property>();
@@ -141,11 +157,15 @@ internal static class BogusDataSeeder
                 }
                 while (!usedNumbers.Add(unitNumber));
 
+                // Drawn in the same order as before so the seeded data set is unchanged; the type then decides the bedroom count.
+                var drawnBedrooms = faker.Random.Int(0, 4);
+                var rent = faker.Random.Decimal(900, 3500);
+
                 property.Units.Add(new Unit
                 {
                     UnitNumber = unitNumber,
-                    Bedrooms = faker.Random.Int(0, 4),
-                    RentAmount = faker.Random.Decimal(900, 3500),
+                    Bedrooms = BedroomsFor(type, drawnBedrooms),
+                    RentAmount = rent,
                     UnitTypeId = type.Id
                 });
             }
