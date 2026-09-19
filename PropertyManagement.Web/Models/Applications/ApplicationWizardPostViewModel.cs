@@ -8,6 +8,9 @@ public class ApplicationWizardPostViewModel
 {
     public string Action { get; set; } = "continue";
 
+    // The step this form was rendered for; the persisted step may have moved on since (co-applicants).
+    public int RenderedStep { get; set; }
+
     public string? FullLegalName { get; set; }
     public string? PhoneNumber { get; set; }
     public string? Email { get; set; }

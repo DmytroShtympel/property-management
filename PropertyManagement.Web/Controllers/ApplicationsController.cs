@@ -68,6 +68,11 @@ public class ApplicationsController(
             return Forbid();
         }
 
+        // Use the rendered step, not the persisted pointer, so a co-applicant advancing it can't make this save skip its stale check.
+        var step = Enum.IsDefined(typeof(ApplicationStep), model.RenderedStep)
+            ? (ApplicationStep)model.RenderedStep
+            : application.CurrentStep;
+
         // FR-7: Back never saves. Continue/Submit validate the current section first — an invalid
         // section is re-rendered in place with errors and the posted (unsaved) values, leaving
         // persisted data untouched and never advancing.
@@ -75,7 +80,7 @@ public class ApplicationsController(
         // section even though it fails validation and advances; the Summary then lists what still
         // blocks Submit. Continue keeps its strict behavior, so the two never mix implicitly.
         var force = model.Action == "force";
-        if (application.CurrentStep == ApplicationStep.ApplicantInformation
+        if (step == ApplicationStep.ApplicantInformation
             && model.Action != "back" && !model.Action.StartsWith("goto-"))
         {
             var candidate = new ApplicantInformation
@@ -88,7 +93,7 @@ public class ApplicationsController(
             var errors = ApplicantInformationValidator.Validate(candidate);
             if (errors.Count > 0 && !force)
             {
-                var invalidVm = BuildWizardViewModel(application);
+                var invalidVm = BuildWizardViewModel(application, step);
                 invalidVm.ApplicantInformation = new ApplicantInformationStepViewModel
                 {
                     FullLegalName = candidate.FullLegalName,
@@ -117,9 +122,9 @@ public class ApplicationsController(
         switch (model.Action)
         {
             case "back":
-                if (application.CurrentStep > ApplicationStep.ApplicantInformation)
+                if (step > ApplicationStep.ApplicantInformation)
                 {
-                    await applications.SetStepAsync(id, UserId, application.CurrentStep - 1);
+                    await applications.SetStepAsync(id, UserId, step - 1);
                 }
                 break;
 
@@ -149,20 +154,20 @@ public class ApplicationsController(
                 break;
 
             default: // "continue" or "force"
-                if (!force && application.CurrentStep == ApplicationStep.ResidenceHistory)
+                if (!force && step == ApplicationStep.ResidenceHistory)
                 {
                     var sectionErrors = ResidenceHistoryValidator.ValidateSection(application.ResidenceHistoryEntries.ToList());
                     if (sectionErrors.Count > 0)
                     {
-                        var invalidVm = BuildWizardViewModel(application);
+                        var invalidVm = BuildWizardViewModel(application, step);
                         Response.StatusCode = 422;
                         return View("Wizard", invalidVm);
                     }
                 }
 
-                if (application.CurrentStep < ApplicationStep.Summary)
+                if (step < ApplicationStep.Summary)
                 {
-                    await applications.SetStepAsync(id, UserId, application.CurrentStep + 1);
+                    await applications.SetStepAsync(id, UserId, step + 1);
                 }
                 break;
         }
@@ -324,16 +329,18 @@ public class ApplicationsController(
         return View(BuildDetailsViewModel(application, IsManager));
     }
 
-    private ApplicationWizardViewModel BuildWizardViewModel(RentalApplication application)
+    private ApplicationWizardViewModel BuildWizardViewModel(RentalApplication application, ApplicationStep? stepToShow = null)
     {
-        var currentErrors = application.CurrentStep switch
+        var currentStep = stepToShow ?? application.CurrentStep;
+
+        var currentErrors = currentStep switch
         {
             ApplicationStep.ApplicantInformation => ApplicantInformationValidator.Validate(application.ApplicantInformation),
             ApplicationStep.ResidenceHistory => ResidenceHistoryValidator.ValidateSection(application.ResidenceHistoryEntries.ToList()),
             _ => []
         };
 
-        var blocking = application.CurrentStep == ApplicationStep.Summary
+        var blocking = currentStep == ApplicationStep.Summary
             ? ApplicationSectionValidator.GetBlockingErrors(application)
             : [];
 
@@ -346,7 +353,7 @@ public class ApplicationsController(
         {
             Id = application.Id,
             Status = application.Status,
-            CurrentStep = application.CurrentStep,
+            CurrentStep = currentStep,
             IsReadOnly = application.Status is not (ApplicationStatus.Draft or ApplicationStatus.Returned),
             UnitLabel = $"{application.Unit!.Property!.Name} — Unit {application.Unit.UnitNumber}",
             ApplicantNames = application.Applicants.Select(a => a.User?.FullName ?? a.UserId).ToList(),

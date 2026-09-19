@@ -23,6 +23,7 @@
 </ul>
 
 <form asp-action="Wizard" asp-route-id="@Model.Id" method="post">
+    <input type="hidden" name="RenderedStep" value="@((int)Model.CurrentStep)" />
     @switch (Model.CurrentStep)
     {
         case ApplicationStep.ApplicantInformation:
