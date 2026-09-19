@@ -21,7 +21,7 @@ cd property-management
 dotnet run --project PropertyManagement.Web
 ```
 
-Then open **http://localhost:5117** (the default launch profile also opens your browser and runs in the `Development` environment) and sign in with one of the [demo accounts](#demo-accounts).
+Then open **http://localhost:5117** in your browser (the default launch profile serves it there, in the `Development` environment) and sign in with one of the [demo accounts](#demo-accounts).
 
 On first run the app:
 1. Creates the `PropertyManagementDb` database and applies the EF Core migrations automatically (`Database.MigrateAsync()` on startup — no manual `dotnet ef database update` step).
