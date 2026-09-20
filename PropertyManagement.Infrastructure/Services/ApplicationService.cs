@@ -15,8 +15,15 @@ public class ApplicationService(
 {
     // IgnoreQueryFilters: removing a unit or property only hides it from browsing and management;
     // its applications and leases are kept, so the required Unit join must not drop them.
+    // AsSplitQuery: Applicants, ResidenceHistoryEntries, StatusHistory and Unit.Leases are four
+    // sibling/nested one-to-many collections. A single query joins all of them together, so an
+    // application with 2 applicants would return each residence-history row twice (a SQL
+    // cross-product) - e.g. a co-applicant application showing every residence entry doubled on
+    // screen even though only one row exists in the database. Splitting into one query per
+    // collection avoids the cross-product.
     private IQueryable<RentalApplication> FullGraph() => db.RentalApplications
         .IgnoreQueryFilters()
+        .AsSplitQuery()
         .Include(a => a.Applicants).ThenInclude(x => x.User)
         .Include(a => a.ApplicantInformation)
         .Include(a => a.ResidenceHistoryEntries)
@@ -209,6 +216,34 @@ public class ApplicationService(
 
         await db.SaveChangesAsync(ct);
         return entry;
+    }
+
+    /// <summary>Reads the residence-history rows for a fragment re-render (e.g. right after
+    /// SaveResidenceEntryAsync in the same request/DbContext). Deliberately does not go through
+    /// GetForWizardAsync/FullGraph(): that query's Include(a => a.ResidenceHistoryEntries) targets
+    /// the same tracked RentalApplication whose ResidenceHistoryEntries collection the save just
+    /// added an entry to directly, and EF re-adds the row the identity map resolves to on top of
+    /// it, duplicating it in the collection (not in the database - a second, unrelated query in a
+    /// fresh context reads back the correct single row). Querying ResidenceHistoryEntries on its
+    /// own avoids ever touching that collection a second time.</summary>
+    public async Task<List<ResidenceHistoryEntry>> GetResidenceHistoryEntriesAsync(int applicationId, string userId, CancellationToken ct = default)
+    {
+        var applicants = await db.RentalApplications
+            .IgnoreQueryFilters()
+            .Where(a => a.Id == applicationId)
+            .SelectMany(a => a.Applicants)
+            .Select(a => a.UserId)
+            .ToListAsync(ct);
+
+        if (!applicants.Contains(userId))
+        {
+            throw new ApplicationAccessDeniedException(applicationId);
+        }
+
+        return await db.ResidenceHistoryEntries
+            .Where(e => e.RentalApplicationId == applicationId)
+            .OrderBy(e => e.Id)
+            .ToListAsync(ct);
     }
 
     public async Task DeleteResidenceEntryAsync(int applicationId, string userId, int entryId, CancellationToken ct = default)

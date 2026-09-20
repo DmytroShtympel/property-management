@@ -360,13 +360,21 @@ public class ApplicationsController(
         return fragment ? PartialView("_ApplicationDetails", model) : View(model);
     }
 
+    // Re-running GetForWizardAsync's full-graph query on the same (scoped) DbContext that a
+    // preceding save just used produces a duplicate: SaveResidenceEntryAsync adds the new/edited
+    // entry to the tracked RentalApplication's ResidenceHistoryEntries collection directly, and a
+    // second Include query against that same tracked instance appends the row the identity map
+    // resolves to on top of the entry already sitting in the collection, instead of recognizing it
+    // as the same one. Loading the entries directly, rather than through the cached application
+    // graph, avoids re-triggering that fixup.
     private async Task<IActionResult> ResidenceHistoryFragmentAsync(int id)
     {
-        var application = await applications.GetForWizardAsync(id, UserId);
+        var entries = (await applications.GetResidenceHistoryEntriesAsync(id, UserId))
+            .Select(ToResidenceViewModel).ToList();
         return ViewComponent("ResidenceHistory", new
         {
             applicationId = id,
-            entries = application!.ResidenceHistoryEntries.Select(ToResidenceViewModel).ToList(),
+            entries = entries,
             isReadOnly = false
         });
     }

@@ -9,7 +9,7 @@
 
 <form method="get" class="row g-2 mb-3">
     <div class="col-auto">
-        <select name="status" class="form-select" asp-items="Html.GetEnumSelectList<PropertyManagement.Domain.Enums.ApplicationStatus>()" onchange="this.form.submit()">
+        <select name="status" asp-for="Status" class="form-select" asp-items="Html.GetEnumSelectList<PropertyManagement.Domain.Enums.ApplicationStatus>()" onchange="this.form.submit()">
             <option value="">All statuses</option>
         </select>
     </div>

@@ -27,6 +27,7 @@ public interface IApplicationService
 
     Task<ResidenceHistoryEntry> SaveResidenceEntryAsync(int applicationId, string userId, int? entryId, ResidenceHistoryInput input, CancellationToken ct = default);
     Task DeleteResidenceEntryAsync(int applicationId, string userId, int entryId, CancellationToken ct = default);
+    Task<List<ResidenceHistoryEntry>> GetResidenceHistoryEntriesAsync(int applicationId, string userId, CancellationToken ct = default);
 
     Task AddCoApplicantAsync(int applicationId, string requestingUserId, string newApplicantEmail, CancellationToken ct = default);
 }

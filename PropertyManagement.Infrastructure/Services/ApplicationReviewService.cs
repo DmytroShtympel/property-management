@@ -12,8 +12,13 @@ public class ApplicationReviewService(
     ApplicationClaimService claimService) : IApplicationReviewService
 {
     // IgnoreQueryFilters: a removed unit or property must not hide its applications (see ApplicationService).
+    // AsSplitQuery: Applicants, ResidenceHistoryEntries, StatusHistory and Notes are sibling
+    // one-to-many collections; one query joining all of them cross-products, so e.g. a
+    // co-applicant application (2 Applicants rows) would show every residence-history and
+    // status-history row twice even though only one row exists in the database.
     private IQueryable<RentalApplication> FullGraph() => db.RentalApplications
         .IgnoreQueryFilters()
+        .AsSplitQuery()
         .Include(a => a.Applicants).ThenInclude(x => x.User)
         .Include(a => a.ApplicantInformation)
         .Include(a => a.ResidenceHistoryEntries)
